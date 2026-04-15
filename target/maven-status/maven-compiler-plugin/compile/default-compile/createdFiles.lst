@@ -1,0 +1,13 @@
+com\example\saga\outbox\OutboxPublisherScheduler.class
+com\example\saga\common\event\PlatformEventFactory.class
+com\example\saga\common\event\CorrelationContext.class
+com\example\saga\config\KafkaConfig.class
+com\example\saga\config\AppConfig.class
+com\example\saga\common\event\PlatformProperties.class
+com\example\saga\consumer\ProcessedEventRepository.class
+com\example\saga\outbox\OutboxRepository.class
+com\example\saga\outbox\OutboxStatus.class
+com\example\saga\consumer\ProcessedEventEntity.class
+com\example\saga\common\event\PlatformEventEnvelope.class
+com\example\saga\outbox\OutboxEventEntity.class
+com\example\saga\common\web\CorrelationWebFilter.class
