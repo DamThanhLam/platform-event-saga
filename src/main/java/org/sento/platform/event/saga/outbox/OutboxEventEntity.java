@@ -1,9 +1,10 @@
 package org.sento.platform.event.saga.outbox;
 
-import org.sento.platform.event.saga.common.event.PlatformEventEnvelope;
+import org.sento.platform.event.saga.common.event.EventEnvelope;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -19,6 +20,9 @@ public class OutboxEventEntity {
 
     @Id
     private String id;
+
+    @Value("${platform.event.source-service}")
+    private String source;
 
     @Field("aggregate_type")
     private String aggregateType;
@@ -75,36 +79,42 @@ public class OutboxEventEntity {
     protected OutboxEventEntity() {}
 
     public static OutboxEventEntity newEvent(
-        PlatformEventEnvelope event,
+        EventEnvelope event,
         String topic,
         String messageKey,
         Map<String, String> extraHeaders
     ) {
         OutboxEventEntity entity = new OutboxEventEntity();
-        entity.id = event.eventId();
-        entity.aggregateType = event.aggregateType();
-        entity.aggregateId = event.aggregateId();
-        entity.aggregateVersion = event.aggregateVersion();
-        entity.eventType = event.eventType();
-        entity.eventVersion = event.eventVersion();
+
+        entity.id = event.getEventId();
+        entity.aggregateType = event.getAggregateType();
+        entity.aggregateId = event.getAggregateId();
+        entity.aggregateVersion = event.getAggregateVersion();
+        entity.eventType = event.getEventType();
+        entity.eventVersion = event.getEventVersion();
+
         entity.topic = topic;
         entity.messageKey = messageKey;
-        entity.correlationId = event.correlationId();
-        entity.causationId = event.causationId();
-        entity.sagaId = event.sagaId();
-        entity.traceId = event.traceId();
-        entity.tenantId = event.tenantId();
 
-        entity.headers = event.headers();
+        entity.correlationId = event.getCorrelationId();
+        entity.causationId = event.getCausationId();
+        entity.sagaId = event.getSagaId();
+        entity.traceId = event.getTraceId();
+        entity.tenantId = event.getTenantId();
+
+        // headers safe copy
+        entity.headers = event.getHeaders() != null
+            ? new LinkedHashMap<>(event.getHeaders())
+            : new LinkedHashMap<>();
+
         if (extraHeaders != null && !extraHeaders.isEmpty()) {
-            entity.headers = new LinkedHashMap<>(entity.headers);
             entity.headers.putAll(extraHeaders);
         }
 
-        entity.payload = event.payload();
+        entity.payload = event.getPayload();
         entity.status = OutboxStatus.NEW;
         entity.attempts = 0;
-        entity.createdAt = event.occurredAt();
+        entity.createdAt = event.getOccurredAt();
 
         return entity;
     }
@@ -121,23 +131,26 @@ public class OutboxEventEntity {
         this.lastError = error;
     }
 
-    public PlatformEventEnvelope toEnvelope() {
-        return new PlatformEventEnvelope(
-            id,
-            eventType,
-            eventVersion,
-            createdAt,
-            "saga-platform",
-            aggregateType,
-            aggregateId,
-            aggregateVersion,
-            correlationId,
-            causationId,
-            sagaId,
-            traceId,
-            tenantId,
-            headers,
-            payload
-        );
+    public EventEnvelope toEnvelope() {
+        return EventEnvelope.builder()
+            .eventId(this.id)
+            .eventType(this.eventType)
+            .eventVersion(this.eventVersion)
+            .occurredAt(this.createdAt)
+            .sourceService("saga-platform")
+
+            .aggregateType(this.aggregateType)
+            .aggregateId(this.aggregateId)
+            .aggregateVersion(this.aggregateVersion)
+
+            .correlationId(this.correlationId)
+            .causationId(this.causationId)
+            .sagaId(this.sagaId)
+            .traceId(this.traceId)
+            .tenantId(this.tenantId)
+
+            .headers(this.headers)
+            .payload(this.payload)
+            .build();
     }
 }

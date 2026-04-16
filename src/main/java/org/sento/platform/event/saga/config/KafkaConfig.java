@@ -6,6 +6,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,9 +54,9 @@ public class KafkaConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
-            ConsumerFactory<Object, Object> consumerFactory,
-            KafkaTemplate<String, String> kafkaTemplate,
-            ConcurrentKafkaListenerContainerFactoryConfigurer configurer
+        ConsumerFactory<Object, Object> consumerFactory,
+        KafkaTemplate<String, String> kafkaTemplate,
+        ConcurrentKafkaListenerContainerFactoryConfigurer configurer
     ) {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         configurer.configure(factory, consumerFactory);
