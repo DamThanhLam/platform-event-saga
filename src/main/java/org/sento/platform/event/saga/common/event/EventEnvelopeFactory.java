@@ -51,7 +51,8 @@ public class EventEnvelopeFactory {
         T payload
     ) throws JsonProcessingException {
 
-        String payloadNode = objectMapper.writeValueAsString(payload);
+        Object cleanPayload = objectMapper.convertValue(payload, Object.class);
+        String json = objectMapper.writeValueAsString(cleanPayload);
 
         return EventEnvelope.builder()
             .eventId(UUID.randomUUID().toString())
@@ -71,7 +72,7 @@ public class EventEnvelopeFactory {
             .tenantId(correlationContext.tenantId())
 
             .headers(safeHeaders(headers))
-            .payload(payloadNode)
+            .payload(json)
             .build();
     }
 

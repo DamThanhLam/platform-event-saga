@@ -38,6 +38,7 @@ public class OutboxPublisherScheduler {
 
     @Scheduled(fixedDelayString = "${app.outbox.fixed-delay-ms:3000}")
     public void publishPendingEvents() {
+        log.info("Outbox scheduler start");
         outboxService.getNextBatch(source, batchSize)
             .flatMap(this::processEvent, CONCURRENCY)
             .doOnError(ex -> log.error("Outbox scheduler failed", ex))
