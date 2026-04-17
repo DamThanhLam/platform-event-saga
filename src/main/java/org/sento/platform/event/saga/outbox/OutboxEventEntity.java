@@ -137,7 +137,7 @@ public class OutboxEventEntity {
             .eventType(this.eventType)
             .eventVersion(this.eventVersion)
             .occurredAt(this.createdAt)
-            .sourceService("saga-platform")
+            .sourceService(this.source)
 
             .aggregateType(this.aggregateType)
             .aggregateId(this.aggregateId)

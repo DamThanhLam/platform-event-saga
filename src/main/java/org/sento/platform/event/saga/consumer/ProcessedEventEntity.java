@@ -1,5 +1,6 @@
 package org.sento.platform.event.saga.consumer;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -12,6 +13,7 @@ import java.time.Instant;
 @Document(collection = "processed_event")
 @Getter
 @Setter
+@AllArgsConstructor
 @CompoundIndexes({
     @CompoundIndex(
         name = "unique_event_consumer_idx",
