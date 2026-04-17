@@ -1,10 +1,12 @@
 package org.sento.platform.event.saga.outbox.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.sento.platform.event.saga.common.event.EventEnvelope;
 import org.sento.platform.event.saga.outbox.OutboxEventEntity;
 import org.sento.platform.event.saga.outbox.OutboxRepository;
 import org.sento.platform.event.saga.outbox.OutboxService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,8 +14,14 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DefaultOutboxService implements OutboxService {
+
+    @Value("${platform.event.source-service}")
+    private String sourceService;
+
+    @Value("${app.outbox.max-attempts:5}")
+    private int maxAttempts;
 
     private final OutboxRepository outboxRepository;
 
@@ -25,6 +33,7 @@ public class DefaultOutboxService implements OutboxService {
         Map<String, String> extraHeaders
     ) {
         OutboxEventEntity entity = OutboxEventEntity.newEvent(
+            sourceService,
             eventEnvelope,
             topic,
             messageKey,
@@ -37,7 +46,7 @@ public class DefaultOutboxService implements OutboxService {
     @Override
     public Flux<OutboxEventEntity> getNextBatch(String source, int batchSize) {
         return outboxRepository
-            .findNextBatchBySource(source, batchSize)
+            .findNextBatchBySource(source, maxAttempts)
             .take(batchSize);
     }
 

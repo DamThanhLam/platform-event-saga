@@ -8,6 +8,12 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface OutboxRepository extends ReactiveCrudRepository<OutboxEventEntity, String> {
 
-    @Query(value = "{ 'source' : ?0, 'status': { $in: ['NEW', 'FAILED'] }, 'attempts': { $lt: ?1 } }")
+    @Query("""
+    {
+      'source': ?0,
+      'status': { $in: ['NEW', 'FAILED'] },
+      'attempts': { $lt: ?1 }
+    }
+    """)
     Flux<OutboxEventEntity> findNextBatchBySource(String source, int maxAttempts);
 }

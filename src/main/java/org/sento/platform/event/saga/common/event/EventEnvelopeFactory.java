@@ -1,5 +1,6 @@
 package org.sento.platform.event.saga.common.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class EventEnvelopeFactory {
         long aggregateVersion,
         String causationId,
         T payload
-    ) {
+    ) throws JsonProcessingException {
         return create(
             eventType,
             eventVersion,
@@ -48,9 +49,9 @@ public class EventEnvelopeFactory {
         String causationId,
         Map<String, String> headers,
         T payload
-    ) {
+    ) throws JsonProcessingException {
 
-        JsonNode payloadNode = objectMapper.valueToTree(payload);
+        String payloadNode = objectMapper.writeValueAsString(payload);
 
         return EventEnvelope.builder()
             .eventId(UUID.randomUUID().toString())

@@ -15,7 +15,7 @@ public class DeadLetterListener {
 
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "${platform.event.dlts}", groupId = "${platform.event.group.dtl}")
+    @KafkaListener(topics = "#{'${platform.event.dlts}'.split(',')}", groupId = "${platform.event.group.dlt}")
     public void consumeDlt(String message) throws Exception {
         try {
             EventEnvelope event = objectMapper.readValue(message, EventEnvelope.class);

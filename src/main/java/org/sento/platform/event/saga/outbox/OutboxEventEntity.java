@@ -21,7 +21,6 @@ public class OutboxEventEntity {
     @Id
     private String id;
 
-    @Value("${platform.event.source-service}")
     private String source;
 
     @Field("aggregate_type")
@@ -61,7 +60,7 @@ public class OutboxEventEntity {
 
     private Map<String, String> headers;
 
-    private JsonNode payload;
+    private String payload;
 
     private OutboxStatus status;
 
@@ -79,13 +78,13 @@ public class OutboxEventEntity {
     protected OutboxEventEntity() {}
 
     public static OutboxEventEntity newEvent(
+        String sourceService,
         EventEnvelope event,
         String topic,
         String messageKey,
         Map<String, String> extraHeaders
     ) {
         OutboxEventEntity entity = new OutboxEventEntity();
-
         entity.id = event.getEventId();
         entity.aggregateType = event.getAggregateType();
         entity.aggregateId = event.getAggregateId();
@@ -93,6 +92,7 @@ public class OutboxEventEntity {
         entity.eventType = event.getEventType();
         entity.eventVersion = event.getEventVersion();
 
+        entity.source = sourceService;
         entity.topic = topic;
         entity.messageKey = messageKey;
 

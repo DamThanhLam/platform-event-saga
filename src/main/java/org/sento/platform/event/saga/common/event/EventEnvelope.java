@@ -1,6 +1,5 @@
 package org.sento.platform.event.saga.common.event;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
 
 import java.time.Instant;
@@ -27,7 +26,7 @@ public class EventEnvelope {
     private String traceId;
     private String tenantId;
     private Map<String, String> headers;
-    private JsonNode payload;
+    private String payload;
 
     public Map<String, String> getHeaders() {
         if (headers == null) {

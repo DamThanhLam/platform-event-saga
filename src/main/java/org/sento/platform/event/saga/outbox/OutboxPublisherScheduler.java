@@ -19,7 +19,6 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnBean(KafkaTemplate.class)
 public class OutboxPublisherScheduler {
 
     private final OutboxService outboxService;
