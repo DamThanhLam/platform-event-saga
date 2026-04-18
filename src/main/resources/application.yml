@@ -13,9 +13,8 @@ spring:
         spring.json.trusted.packages: "*"
 platform:
   event:
-    source-service: saga-platform
-app:
-  outbox:
-    batch-size: 50
-    fixed-delay-ms: 3000
-    max-attempts: 5
+    outbox:
+      source-service: saga-platform
+      batch-size: 50
+      fixed-delay-ms: 3000
+      max-attempts: 5

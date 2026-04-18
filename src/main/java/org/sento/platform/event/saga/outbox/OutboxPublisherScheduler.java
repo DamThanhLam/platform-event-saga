@@ -28,15 +28,15 @@ public class OutboxPublisherScheduler {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${app.outbox.batch-size:50}")
+    @Value("${platform.event.outbox.batch-size:50}")
     private int batchSize;
 
-    @Value("${platform.event.source-service}")
+    @Value("${platform.event.outbox.source-service}")
     private String source;
 
     private static final int CONCURRENCY = 10;
 
-    @Scheduled(fixedDelayString = "${app.outbox.fixed-delay-ms:3000}")
+    @Scheduled(fixedDelayString = "${platform.event.outbox.fixed-delay-ms:3000}")
     public void publishPendingEvents() {
         log.info("Outbox scheduler start");
         outboxService.getNextBatch(source, batchSize)
