@@ -41,7 +41,7 @@ public class OutboxEvent {
     private Instant createdAt;
     private Instant publishedAt;
 
-    protected OutboxEvent() {}
+    public OutboxEvent() {}
 
     public static OutboxEvent newEvent(
         String sourceService,
