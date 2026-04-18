@@ -1,13 +1,11 @@
 package org.sento.platform.event.saga.outbox;
 
 import org.sento.platform.event.saga.common.event.EventEnvelope;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@Service
 public interface OutboxService {
 
     Mono<String> create(
