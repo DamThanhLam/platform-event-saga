@@ -7,12 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.sento.platform.event.saga.common.event.EventEnvelope;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+    name = "platform.event.dlts",
+    havingValue = "false",
+    matchIfMissing = false
+)
 public class DeadLetterListener {
 
     private final ObjectMapper objectMapper;
