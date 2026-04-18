@@ -1,10 +1,12 @@
 package org.sento.platform.event.saga.dtl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sento.platform.event.saga.common.event.EventEnvelope;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,15 @@ public class DeadLetterListener {
 
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "#{'${platform.event.dlts}'.split(',')}", groupId = "${platform.event.group.dlt}")
+    @Value("${platform.event.dlts}")
+    private String dltTopic;
+
+    @PostConstruct
+    public void init() {
+        log.info("DLT topic resolved = {}", dltTopic);
+    }
+
+    @KafkaListener(topics = "${platform.event.dlts}", groupId = "${platform.event.group.dlt}")
     public void consumeDlt(String message) throws Exception {
         try {
             EventEnvelope event = objectMapper.readValue(message, EventEnvelope.class);

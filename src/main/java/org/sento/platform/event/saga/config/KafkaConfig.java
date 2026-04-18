@@ -6,7 +6,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,7 +93,9 @@ public class KafkaConfig {
         });
 
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 2L));
-        errorHandler.addRetryableExceptions(IllegalStateException.class, RuntimeException.class);
+        errorHandler.addRetryableExceptions(
+            RuntimeException.class
+        );
         factory.setCommonErrorHandler(errorHandler);
         return factory;
     }

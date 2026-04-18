@@ -60,7 +60,7 @@ public class OutboxEventEntity {
 
     private Map<String, String> headers;
 
-    private String payload;
+    private byte[] payload;
 
     private OutboxStatus status;
 
@@ -102,7 +102,6 @@ public class OutboxEventEntity {
         entity.traceId = event.getTraceId();
         entity.tenantId = event.getTenantId();
 
-        // headers safe copy
         entity.headers = event.getHeaders() != null
             ? new LinkedHashMap<>(event.getHeaders())
             : new LinkedHashMap<>();

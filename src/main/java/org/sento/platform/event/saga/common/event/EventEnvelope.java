@@ -26,7 +26,7 @@ public class EventEnvelope {
     private String traceId;
     private String tenantId;
     private Map<String, String> headers;
-    private String payload;
+    private byte[] payload;
 
     public Map<String, String> getHeaders() {
         if (headers == null) {
