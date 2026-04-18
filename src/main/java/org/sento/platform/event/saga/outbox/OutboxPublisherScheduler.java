@@ -45,7 +45,7 @@ public class OutboxPublisherScheduler {
             .subscribe();
     }
 
-    private Mono<Void> processEvent(OutboxEventEntity entity) {
+    private Mono<Void> processEvent(OutboxEvent entity) {
         String eventId = entity.getId();
 
         return Mono.fromCallable(entity::toEnvelope)

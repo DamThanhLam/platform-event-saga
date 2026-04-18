@@ -17,7 +17,7 @@ public interface OutboxService {
         Map<String, String> extraHeaders
     );
 
-    Flux<OutboxEventEntity> getNextBatch(String source, int batchSize);
+    Flux<OutboxEvent> getNextBatch(String source, int batchSize);
 
     Mono<Void> markPublished(String id);
 

@@ -1,29 +1,21 @@
 package org.sento.platform.event.saga.outbox.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.sento.platform.event.saga.common.event.EventEnvelope;
-import org.sento.platform.event.saga.outbox.OutboxEventEntity;
-import org.sento.platform.event.saga.outbox.OutboxRepository;
+import org.sento.platform.event.saga.outbox.OutboxEvent;
 import org.sento.platform.event.saga.outbox.OutboxService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.sento.platform.event.saga.outbox.OutboxStore;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@Service
 @RequiredArgsConstructor
 public class DefaultOutboxService implements OutboxService {
 
-    @Value("${platform.event.source-service}")
-    private String sourceService;
-
-    @Value("${app.outbox.max-attempts:5}")
-    private int maxAttempts;
-
-    private final OutboxRepository outboxRepository;
+    private final String sourceService;
+    private final int maxAttempts;
+    private final OutboxStore outboxStore;
 
     @Override
     public Mono<String> create(
@@ -32,42 +24,41 @@ public class DefaultOutboxService implements OutboxService {
         String messageKey,
         Map<String, String> extraHeaders
     ) {
-        OutboxEventEntity entity = OutboxEventEntity.newEvent(
+        OutboxEvent event = OutboxEvent.newEvent(
             sourceService,
             eventEnvelope,
             topic,
             messageKey,
             extraHeaders
         );
-        return outboxRepository.save(entity)
-            .map(OutboxEventEntity::getId);
+
+        return outboxStore.save(event)
+            .map(OutboxEvent::getId);
     }
 
     @Override
-    public Flux<OutboxEventEntity> getNextBatch(String source, int batchSize) {
-        return outboxRepository
-            .findNextBatchBySource(source, maxAttempts)
-            .take(batchSize);
+    public Flux<OutboxEvent> getNextBatch(String source, int batchSize) {
+        return outboxStore.findNextBatch(source, maxAttempts, batchSize);
     }
 
     @Override
     public Mono<Void> markPublished(String id) {
-        return outboxRepository.findById(id)
+        return outboxStore.findById(id)
             .switchIfEmpty(Mono.error(new RuntimeException("Outbox not found: " + id)))
-            .flatMap(entity -> {
-                entity.markPublished();
-                return outboxRepository.save(entity);
+            .flatMap(event -> {
+                event.markPublished();
+                return outboxStore.save(event);
             })
             .then();
     }
 
     @Override
     public Mono<Void> markFailed(String id, String reason) {
-        return outboxRepository.findById(id)
+        return outboxStore.findById(id)
             .switchIfEmpty(Mono.error(new RuntimeException("Outbox not found: " + id)))
-            .flatMap(entity -> {
-                entity.markFailed(reason);
-                return outboxRepository.save(entity);
+            .flatMap(event -> {
+                event.markFailed(reason);
+                return outboxStore.save(event);
             })
             .then();
     }

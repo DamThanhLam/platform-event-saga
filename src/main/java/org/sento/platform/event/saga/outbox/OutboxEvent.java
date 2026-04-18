@@ -1,61 +1,33 @@
 package org.sento.platform.event.saga.outbox;
 
 import org.sento.platform.event.saga.common.event.EventEnvelope;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-@Document(collection = "outbox_event")
 @Getter
 @Setter
-public class OutboxEventEntity {
+public class OutboxEvent {
 
-    @Id
     private String id;
-
     private String source;
 
-    @Field("aggregate_type")
     private String aggregateType;
-
-    @Field("aggregate_id")
     private String aggregateId;
-
-    @Field("aggregate_version")
     private long aggregateVersion;
 
-    @Field("event_type")
     private String eventType;
-
-    @Field("event_version")
     private int eventVersion;
 
     private String topic;
-
-    @Field("message_key")
     private String messageKey;
 
-    @Field("correlation_id")
     private String correlationId;
-
-    @Field("causation_id")
     private String causationId;
-
-    @Field("saga_id")
     private String sagaId;
-
-    @Field("trace_id")
     private String traceId;
-
-    @Field("tenant_id")
     private String tenantId;
 
     private Map<String, String> headers;
@@ -63,28 +35,23 @@ public class OutboxEventEntity {
     private byte[] payload;
 
     private OutboxStatus status;
-
     private int attempts;
-
-    @Field("last_error")
     private String lastError;
 
-    @Field("created_at")
     private Instant createdAt;
-
-    @Field("published_at")
     private Instant publishedAt;
 
-    protected OutboxEventEntity() {}
+    protected OutboxEvent() {}
 
-    public static OutboxEventEntity newEvent(
+    public static OutboxEvent newEvent(
         String sourceService,
         EventEnvelope event,
         String topic,
         String messageKey,
         Map<String, String> extraHeaders
     ) {
-        OutboxEventEntity entity = new OutboxEventEntity();
+        OutboxEvent entity = new OutboxEvent();
+
         entity.id = event.getEventId();
         entity.aggregateType = event.getAggregateType();
         entity.aggregateId = event.getAggregateId();
@@ -102,11 +69,11 @@ public class OutboxEventEntity {
         entity.traceId = event.getTraceId();
         entity.tenantId = event.getTenantId();
 
-        entity.headers = event.getHeaders() != null
-            ? new LinkedHashMap<>(event.getHeaders())
-            : new LinkedHashMap<>();
-
-        if (extraHeaders != null && !extraHeaders.isEmpty()) {
+        entity.headers = new LinkedHashMap<>();
+        if (event.getHeaders() != null) {
+            entity.headers.putAll(event.getHeaders());
+        }
+        if (extraHeaders != null) {
             entity.headers.putAll(extraHeaders);
         }
 
