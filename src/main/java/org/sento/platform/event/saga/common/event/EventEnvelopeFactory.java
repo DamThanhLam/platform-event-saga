@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.sento.platform.event.saga.config.EventSagaProperties;
 import org.sento.platform.event.saga.serializer.AvroSerializer;
+import org.sento.platform.logging.context.CorrelationContext;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
