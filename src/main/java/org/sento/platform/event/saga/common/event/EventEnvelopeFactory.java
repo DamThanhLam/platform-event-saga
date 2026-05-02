@@ -1,7 +1,5 @@
 package org.sento.platform.event.saga.common.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.sento.platform.event.saga.config.EventSagaProperties;
 import org.sento.platform.event.saga.serializer.AvroSerializer;
@@ -16,8 +14,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EventEnvelopeFactory {
 
-    private final ObjectMapper objectMapper;
-    private final CorrelationContext correlationContext;
     private final EventSagaProperties eventSagaProperties;
 
     public <T extends org.apache.avro.specific.SpecificRecord> EventEnvelope create(
@@ -28,13 +24,32 @@ public class EventEnvelopeFactory {
         long aggregateVersion,
         String causationId,
         T payload
-    ) throws JsonProcessingException {
+    ) {
         return create(
             eventType,
             eventVersion,
             aggregateType,
             aggregateId,
             aggregateVersion,
+            causationId,
+            Map.of(),
+            payload
+        );
+    }
+
+    public <T extends org.apache.avro.specific.SpecificRecord> EventEnvelope create(
+        String eventType,
+        String aggregateType,
+        String aggregateId,
+        String causationId,
+        T payload
+    ) {
+        return create(
+            eventType,
+            1,
+            aggregateType,
+            aggregateId,
+            1,
             causationId,
             Map.of(),
             payload
@@ -63,11 +78,11 @@ public class EventEnvelopeFactory {
             .aggregateId(aggregateId)
             .aggregateVersion(aggregateVersion)
 
-            .correlationId(correlationContext.correlationId())
+            .correlationId(CorrelationContext.correlationId())
             .causationId(causationId)
-            .sagaId(correlationContext.sagaId())
-            .traceId(correlationContext.traceId())
-            .tenantId(correlationContext.tenantId())
+            .sagaId(CorrelationContext.sagaId())
+            .traceId(CorrelationContext.traceId())
+            .tenantId(CorrelationContext.tenantId())
 
             .headers(safeHeaders(headers))
             .payload(AvroSerializer.toBytes(payload))

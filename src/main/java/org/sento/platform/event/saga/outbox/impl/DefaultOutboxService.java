@@ -18,6 +18,20 @@ public class DefaultOutboxService implements OutboxService {
     private final OutboxStore outboxStore;
 
     @Override
+    public Mono<String> create(EventEnvelope eventEnvelope, String topic, String messageKey) {
+        OutboxEvent event = OutboxEvent.newEvent(
+            sourceService,
+            eventEnvelope,
+            topic,
+            messageKey,
+            Map.of()
+        );
+
+        return outboxStore.save(event)
+            .map(OutboxEvent::getId);
+    }
+
+    @Override
     public Mono<String> create(
         EventEnvelope eventEnvelope,
         String topic,

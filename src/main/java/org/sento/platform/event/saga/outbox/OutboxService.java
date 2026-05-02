@@ -11,6 +11,12 @@ public interface OutboxService {
     Mono<String> create(
         EventEnvelope eventEnvelope,
         String topic,
+        String messageKey
+    );
+
+    Mono<String> create(
+        EventEnvelope eventEnvelope,
+        String topic,
         String messageKey,
         Map<String, String> extraHeaders
     );
