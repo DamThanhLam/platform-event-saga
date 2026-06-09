@@ -18,3 +18,7 @@ platform:
       batch-size: 50
       fixed-delay-ms: 3000
       max-attempts: 5
+auto:
+  create:
+    topics:
+      enable=true:

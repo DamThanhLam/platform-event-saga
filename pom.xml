@@ -6,7 +6,7 @@
 
     <groupId>org.sento.platform.event.saga</groupId>
     <artifactId>platform-event-saga</artifactId>
-    <version>2.2.2</version>
+    <version>2.3.3</version>
     <packaging>jar</packaging>
 
     <name>saga-platform</name>
@@ -72,6 +72,13 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-avro-serializer</artifactId>
+            <version>7.6.0</version>
+            <optional>true</optional>
+        </dependency>
 
         <dependency>
             <groupId>org.sento.platform.logging</groupId>

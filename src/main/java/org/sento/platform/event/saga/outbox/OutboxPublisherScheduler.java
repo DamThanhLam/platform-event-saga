@@ -5,6 +5,7 @@ import org.sento.platform.event.saga.common.event.EventEnvelope;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sento.platform.event.saga.registry.AvroMapperRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,7 +26,8 @@ import java.util.List;
 public class OutboxPublisherScheduler {
 
     private final OutboxService outboxService;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final AvroMapperRegistry mapperRegistry;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     @Value("${platform.event.outbox.batch-size:50}")
@@ -48,15 +50,14 @@ public class OutboxPublisherScheduler {
     private Mono<Void> processEvent(OutboxEvent entity) {
         String eventId = entity.getId();
 
-        return Mono.fromCallable(entity::toEnvelope)
-            .subscribeOn(Schedulers.boundedElastic())
-            .flatMap(this::serialize)
-            .flatMap(payload ->
+        return Mono.fromCallable(() -> mapperRegistry.toAvro(entity))
+
+            .flatMap(avro ->
                 Mono.fromFuture(
                     kafkaTemplate.send(
                         entity.getTopic(),
                         entity.getMessageKey(),
-                        payload
+                        avro
                     )
                 )
             )
