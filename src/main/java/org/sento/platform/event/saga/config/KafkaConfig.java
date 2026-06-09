@@ -6,6 +6,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,11 @@ import java.util.Map;
 public class KafkaConfig {
 
     @Bean
-    public ProducerFactory<String, String> producerFactory(Environment env) {
+    public ProducerFactory<String, Object> producerFactory(
+        @Value("${spring.kafka.properties.schema.registry.url}")
+        String schemaRegistryUrl,
+        Environment env
+    ) {
         Map<String, Object> props = new HashMap<>();
 
         putIfNotNull(props, ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -33,7 +38,7 @@ public class KafkaConfig {
             env.getProperty("spring.kafka.producer.acks", "all"));
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class);
 
         putIfNotNull(props, ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,
             env.getProperty("spring.kafka.producer.enable-idempotence")); // note the kebab-case
@@ -44,6 +49,13 @@ public class KafkaConfig {
         String retries = env.getProperty("spring.kafka.producer.retries", "10");
         props.put(ProducerConfig.RETRIES_CONFIG, Integer.parseInt(retries));
 
+        props.put(
+            "schema.registry.url",
+            env.getProperty(
+                "spring.kafka.properties.schema.registry.url",
+                "http://localhost:8081"
+            )
+        );
         return new DefaultKafkaProducerFactory<>(props);
     }
 
@@ -54,7 +66,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
@@ -72,16 +84,23 @@ public class KafkaConfig {
             env.getProperty("spring.kafka.consumer.auto-offset-reset", "earliest"));
 
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroDeserializer.class);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-
+        props.put(
+            "schema.registry.url",
+            env.getProperty(
+                "spring.kafka.properties.schema.registry.url",
+                "http://localhost:8081"
+            )
+        );
+        props.put("specific.avro.reader", true);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
         ConsumerFactory<Object, Object> consumerFactory,
-        KafkaTemplate<String, String> kafkaTemplate,
+        KafkaTemplate<String, Object> kafkaTemplate,
         ConcurrentKafkaListenerContainerFactoryConfigurer configurer
     ) {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();

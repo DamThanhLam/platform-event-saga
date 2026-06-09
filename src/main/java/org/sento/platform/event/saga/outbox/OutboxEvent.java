@@ -32,7 +32,7 @@ public class OutboxEvent {
 
     private Map<String, String> headers;
 
-    private byte[] payload;
+    private Object payload;
 
     private OutboxStatus status;
     private int attempts;

@@ -16,7 +16,7 @@ public class EventEnvelopeFactory {
 
     private final EventSagaProperties eventSagaProperties;
 
-    public <T extends org.apache.avro.specific.SpecificRecord> EventEnvelope create(
+    public <T> EventEnvelope create(
         String eventType,
         int eventVersion,
         String aggregateType,
@@ -37,7 +37,7 @@ public class EventEnvelopeFactory {
         );
     }
 
-    public <T extends org.apache.avro.specific.SpecificRecord> EventEnvelope create(
+    public <T> EventEnvelope create(
         String eventType,
         String aggregateType,
         String aggregateId,
@@ -56,7 +56,7 @@ public class EventEnvelopeFactory {
         );
     }
 
-    public <T extends org.apache.avro.specific.SpecificRecord> EventEnvelope create(
+    public <T> EventEnvelope create(
         String eventType,
         int eventVersion,
         String aggregateType,
@@ -85,7 +85,7 @@ public class EventEnvelopeFactory {
             .tenantId(CorrelationContext.tenantId())
 
             .headers(safeHeaders(headers))
-            .payload(AvroSerializer.toBytes(payload))
+            .payload(payload)
             .build();
     }
 

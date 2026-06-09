@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.annotation.RetryableTopic;
 
+@RetryableTopic
 @AutoConfiguration
 @EnableConfigurationProperties(EventSagaProperties.class)
 @ComponentScan(basePackages = "org.sento.platform.event.saga")
