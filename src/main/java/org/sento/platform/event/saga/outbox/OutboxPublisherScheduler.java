@@ -1,16 +1,14 @@
 package org.sento.platform.event.saga.outbox;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.sento.platform.event.saga.common.event.EventEnvelope;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sento.platform.event.saga.common.event.EventEnvelope;
 import org.sento.platform.event.saga.registry.AvroMapperRegistry;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;

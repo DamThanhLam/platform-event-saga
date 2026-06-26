@@ -7,6 +7,7 @@ import org.sento.platform.event.saga.registry.AvroMapperRegistry;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -21,6 +22,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class EventSagaAutoConfiguration {
 
 
+    @Bean
     @ConditionalOnProperty(
         prefix = "platform.event.outbox",
         name = "enabled",
