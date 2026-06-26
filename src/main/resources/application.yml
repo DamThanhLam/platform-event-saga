@@ -11,6 +11,7 @@ spring:
       auto-offset-reset: earliest
       properties:
         spring.json.trusted.packages: "*"
+
 platform:
   event:
     outbox:
